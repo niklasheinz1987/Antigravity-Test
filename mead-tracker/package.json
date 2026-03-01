@@ -1,9 +1,6 @@
 {
   "name": "mead-tracker",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "homepage": "https://mead-tracker.github.io/mead-tracker",
+  "homepage": "https://niklasheinz1987.github.io/Antigravity-Test/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
