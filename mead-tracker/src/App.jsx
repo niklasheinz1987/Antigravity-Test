@@ -29,6 +29,7 @@ function App() {
 
 function AppContent({ tabs, activeTab, setActiveTab }) {
   const { isLoading } = useBatchContext();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -40,10 +41,25 @@ function AppContent({ tabs, activeTab, setActiveTab }) {
     );
   }
 
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   return (
     <div className="app-layout">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="logo">
           <HexagonIcon />
           <h2>Acme Tracker</h2>
@@ -53,7 +69,7 @@ function AppContent({ tabs, activeTab, setActiveTab }) {
             <button
               key={tab.id}
               className={`sidebar-item ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabClick(tab.id)}
             >
               <div className="sidebar-item-icon"><tab.icon size={20} /></div>
               <span>{tab.label}</span>
@@ -61,7 +77,7 @@ function AppContent({ tabs, activeTab, setActiveTab }) {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <button className="btn btn-primary" style={{ width: '100%', borderRadius: '12px' }} onClick={() => setActiveTab('overview')}>
+          <button className="btn btn-primary" style={{ width: '100%', borderRadius: '12px' }} onClick={() => handleTabClick('overview')}>
             <Plus size={18} /> Neue Charge
           </button>
         </div>
@@ -70,7 +86,7 @@ function AppContent({ tabs, activeTab, setActiveTab }) {
       {/* Main Content */}
       <div className="main-wrapper">
         <header className="top-header">
-          <div className="menu-toggle">
+          <div className="menu-toggle" onClick={() => setIsSidebarOpen(true)}>
             <Menu size={20} style={{ color: 'var(--text-secondary)' }} />
             <span>Met Tracker Pro</span>
           </div>
