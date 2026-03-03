@@ -1,6 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { fetchBatches, saveBatch, removeBatch, updateBatchFields } from '../services/db';
 
+const generateId = () => {
+  return (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : Date.now().toString(36) + Math.random().toString(36).substring(2);
+};
+
 const BatchContext = createContext();
 
 export const useBatchContext = () => {
@@ -26,7 +32,7 @@ export const BatchProvider = ({ children }) => {
   const addBatch = async (batchData) => {
     const newBatch = {
       ...batchData,
-      id: crypto.randomUUID(),
+      id: generateId(),
       status: 'active',
       createdAt: new Date().toISOString(),
       fermentationLogs: [],
@@ -38,7 +44,10 @@ export const BatchProvider = ({ children }) => {
     setBatches(prev => [...prev, newBatch]);
 
     // Save to Firebase
-    await saveBatch(newBatch);
+    const success = await saveBatch(newBatch);
+    if (!success) {
+      alert("Die Charge konnte nicht in der Cloud (Firebase) gespeichert werden. Sie ist nur lokal verfügbar bis zum nächsten Neuladen. Bitte prüfen Sie Ihre Firebase-Projektkonfiguration.");
+    }
     return newBatch.id;
   };
 
@@ -47,7 +56,10 @@ export const BatchProvider = ({ children }) => {
     setBatches(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b));
 
     // Save to Firebase
-    await updateBatchFields(id, updates);
+    const success = await updateBatchFields(id, updates);
+    if (!success) {
+      alert("Änderungen konnten nicht in der Cloud gespeichert werden (Firebase Timeout).");
+    }
   };
 
   const deleteBatch = async (id) => {
@@ -56,14 +68,17 @@ export const BatchProvider = ({ children }) => {
     if (activeBatchId === id) setActiveBatchId(null);
 
     // Save to Firebase
-    await removeBatch(id);
+    const success = await removeBatch(id);
+    if (!success) {
+      alert("Löschen in der Cloud fehlgeschlagen (Firebase Timeout).");
+    }
   };
 
   const addFermentationLog = async (batchId, log) => {
     const batch = batches.find(b => b.id === batchId);
     if (!batch) return;
 
-    const newLogs = [...(batch.fermentationLogs || []), { ...log, id: crypto.randomUUID() }]
+    const newLogs = [...(batch.fermentationLogs || []), { ...log, id: generateId() }]
       .sort((x, y) => new Date(x.date) - new Date(y.date));
 
     // Optimistic UI
@@ -90,14 +105,15 @@ export const BatchProvider = ({ children }) => {
     const batch = batches.find(b => b.id === batchId);
     if (!batch) return;
 
-    const newLogs = [...(batch.storageLogs || []), { ...log, id: crypto.randomUUID() }]
+    const newLogs = [...(batch.storageLogs || []), { ...log, id: generateId() }]
       .sort((x, y) => new Date(x.date) - new Date(y.date));
 
     // Optimistic UI
     setBatches(prev => prev.map(b => b.id === batchId ? { ...b, storageLogs: newLogs } : b));
 
     // Update Firebase
-    await updateBatchFields(batchId, { storageLogs: newLogs });
+    const success = await updateBatchFields(batchId, { storageLogs: newLogs });
+    if (!success) alert("Speichern in der Cloud fehlgeschlagen (Firebase Timeout).");
   };
 
   const addConsumptionLog = async (batchId, amount, date, note) => {
@@ -107,7 +123,7 @@ export const BatchProvider = ({ children }) => {
     const currentVol = batch.currentVolume !== undefined ? batch.currentVolume : (batch.volume || 0);
     const newVol = Math.max(0, currentVol - amount);
     const newLogs = [...(batch.consumptionLogs || []), {
-      id: crypto.randomUUID(),
+      id: generateId(),
       amount,
       date,
       note
@@ -121,10 +137,11 @@ export const BatchProvider = ({ children }) => {
     } : b));
 
     // Update Firebase
-    await updateBatchFields(batchId, {
+    const success = await updateBatchFields(batchId, {
       currentVolume: newVol,
       consumptionLogs: newLogs
     });
+    if (!success) alert("Speichern in der Cloud fehlgeschlagen (Firebase Timeout).");
   };
 
   return (

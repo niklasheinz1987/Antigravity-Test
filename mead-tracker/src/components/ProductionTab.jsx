@@ -61,7 +61,7 @@ export default function ProductionTab() {
     const addAdditive = () => {
         setFormData(prev => ({
             ...prev,
-            additives: [...prev.additives, { id: crypto.randomUUID(), name: '', amount: '', unit: 'g' }]
+            additives: [...prev.additives, { id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2), name: '', amount: '', unit: 'g' }]
         }));
     };
 

@@ -14,11 +14,11 @@ export default function OverviewTab({ setActiveTab }) {
     const [newBatchName, setNewBatchName] = useState('');
     const [newBatchNumber, setNewBatchNumber] = useState('');
 
-    const handleCreate = (e) => {
+    const handleCreate = async (e) => {
         e.preventDefault();
         if (!newBatchName.trim()) return;
 
-        const id = addBatch({
+        const id = await addBatch({
             name: newBatchName,
             number: newBatchNumber.trim() || `CH-${new Date().getFullYear()}-${String(batches.length + 1).padStart(3, '0')}`,
         });
