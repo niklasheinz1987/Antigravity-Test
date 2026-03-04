@@ -60,10 +60,7 @@ function AppContent({ tabs, activeTab, setActiveTab }) {
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="logo">
-          <HexagonIcon />
-          <h2>Acme Tracker</h2>
-        </div>
+
         <nav className="sidebar-nav">
           {tabs.map(tab => (
             <button
@@ -76,20 +73,13 @@ function AppContent({ tabs, activeTab, setActiveTab }) {
             </button>
           ))}
         </nav>
-        <div className="sidebar-bottom">
-          <button className="btn btn-primary" style={{ width: '100%', borderRadius: '12px' }} onClick={() => handleTabClick('overview')}>
-            <Plus size={18} /> Neue Charge
-          </button>
-        </div>
+
       </aside>
 
       {/* Main Content */}
       <div className="main-wrapper">
         <header className="top-header">
-          <div className="menu-toggle" onClick={() => setIsSidebarOpen(true)}>
-            <Menu size={20} style={{ color: 'var(--text-secondary)' }} />
-            <span>Met Tracker Pro</span>
-          </div>
+
           <div className="user-profile">
             <span>Met Brauer</span>
             <div className="avatar">
@@ -113,12 +103,6 @@ function AppContent({ tabs, activeTab, setActiveTab }) {
   );
 }
 
-function HexagonIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M11 2.26795C11.6188 1.91068 12.3812 1.91068 13 2.26795L20.3589 6.51666C20.9777 6.87393 21.3589 7.53421 21.3589 8.24871V15.7513C21.3589 16.4658 20.9777 17.1261 20.3589 17.4833L13 21.732C12.3812 22.0893 11.6188 22.0893 11 21.732L3.64106 17.4833C3.02221 17.1261 2.64106 16.4658 2.64106 15.7513V8.24871C2.64106 7.53421 3.02221 6.87393 3.64106 6.51666L11 2.26795Z" stroke="#00b8d9" strokeWidth="2.5" />
-    </svg>
-  );
-}
+
 
 export default App;
