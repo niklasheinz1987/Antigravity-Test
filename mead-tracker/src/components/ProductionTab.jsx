@@ -86,13 +86,19 @@ export default function ProductionTab() {
                     <div>
                         <h2>Produktion</h2>
                     </div>
-                    <select
-                        value={activeBatchId || ""}
-                        onChange={e => setActiveBatchId(e.target.value)}
-                        style={{ maxWidth: '300px', background: 'var(--bg-card)', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
-                    >
-                        {batches.map(b => <option key={b.id} value={b.id}>{b.number} - {b.name}</option>)}
-                    </select>
+                    {batches.length > 1 ? (
+                        <select
+                            value={activeBatchId || ""}
+                            onChange={e => setActiveBatchId(e.target.value)}
+                            style={{ maxWidth: '300px', background: 'var(--bg-card)', padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+                        >
+                            {batches.map(b => <option key={b.id} value={b.id}>{b.number} - {b.name}</option>)}
+                        </select>
+                    ) : (
+                        <span style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                            {activeBatch?.number} - {activeBatch?.name || 'Unbenannt'}
+                        </span>
+                    )}
                 </div>
                 <button className="btn btn-primary" onClick={handleSave}>
                     <Save size={18} /> Speichern

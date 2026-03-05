@@ -27,7 +27,9 @@ export default function OverviewTab({ setActiveTab }) {
         setNewBatchNumber('');
         setIsCreating(false);
         setActiveBatchId(id);
-        if (setActiveTab) setActiveTab('production');
+        setTimeout(() => {
+            if (setActiveTab) setActiveTab('production');
+        }, 50);
     };
 
     const totalBatches = batches.length;
