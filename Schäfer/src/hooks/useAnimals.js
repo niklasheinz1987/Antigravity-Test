@@ -1,36 +1,25 @@
 import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-
-const STORAGE_KEY = 'schaefer_animals_v1';
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export function useAnimals() {
-    const [animals, setAnimals] = useState(() => {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                return JSON.parse(saved);
-            } catch (e) {
-                console.error('Failed to parse animals from local storage', e);
-                return [];
-            }
-        }
-        return [];
-    });
+    const [animals, setAnimals] = useState([]);
 
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(animals));
-    }, [animals]);
+        const q = collection(db, 'animals');
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const animalsData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setAnimals(animalsData);
+        }, (error) => {
+            console.error("Firestore onSnapshot Error:", error);
+            alert("Fehler beim Laden der Tierdaten. Prüfe die Firestore-Sicherheitsregeln: " + error.message);
+        });
 
-    const addAnimal = (animalData) => {
-        const newAnimal = {
-            ...animalData,
-            id: uuidv4(),
-            createdAt: new Date().toISOString()
-        };
-        setAnimals(prev => [...prev, newAnimal]);
-        return newAnimal.id;
-    };
-
+        return unsubscribe;
+    }, []);
     const updateAnimal = (id, updates) => {
         setAnimals(prev => prev.map(a => a.id === id ? { ...a, ...updates, updatedAt: new Date().toISOString() } : a));
     };
